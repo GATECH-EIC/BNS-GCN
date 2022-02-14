@@ -1,0 +1,15 @@
+python main.py \
+  --dataset yelp \
+  --dropout 0.1 \
+  --weight-decay 0 \
+  --lr 0.001 \
+  --n-partitions 3 \
+  --n-epochs 3000 \
+  --model graphsage \
+  --sampling-rate .1 \
+  --n-layers 4 \
+  --n-linear 2 \
+  --n-hidden 512 \
+  --log-every 10 \
+  --inductive \
+  --use-pp
