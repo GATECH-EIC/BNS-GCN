@@ -31,7 +31,6 @@ Note that `./checkpoint/`, `./dataset/`, `./partitions/` and `./results/` are em
 
 - A X86-CPU machine with at least 120 GB host memory 
 - At least five Nvidia GPUs (at least 11 GB each)
-- Has PCI/NVLink connection among GPUs
 
 #### Software Dependencies
 
