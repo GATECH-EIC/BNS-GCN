@@ -14,9 +14,11 @@ if __name__ == '__main__':
 
     if args.graph_name == '':
         if args.inductive:
-            args.graph_name = '%s-%d-%s-induc' % (args.dataset, args.n_partitions, args.partition_method)
+            args.graph_name = '%s-%d-%s-%s-induc' % (args.dataset, args.n_partitions,
+                                                     args.partition_method, args.partition_obj)
         else:
-            args.graph_name = '%s-%d-%s-trans' % (args.dataset, args.n_partitions, args.partition_method)
+            args.graph_name = '%s-%d-%s-%s-trans' % (args.dataset, args.n_partitions,
+                                                     args.partition_method, args.partition_obj)
 
     if args.skip_partition:
         if args.n_feat == 0 or args.n_class == 0 or args.n_train == 0:

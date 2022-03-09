@@ -124,7 +124,7 @@ def graph_partition(g, args):
                 g.ndata.pop('test_mask')
             g.ndata['in_degree'] = g.in_degrees()
             partition_graph(g, args.graph_name, args.n_partitions, graph_dir,  part_method=args.partition_method,
-                            reshuffle=True, balance_edges=False, objtype='vol')
+                            reshuffle=True, balance_edges=False, objtype=args.partition_obj)
 
 
 def load_partition(args, rank):
