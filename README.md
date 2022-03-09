@@ -21,7 +21,7 @@ Accepted at MLSys 2022
 `-- scripts      # example scripts
 ```
 
-Note that `./checkpoint/`, `./dataset/`, `./partitions/` and `./results/` are empty folders at the beginning and will be generated when BNS-GCN is launched.
+Note that `./checkpoint/`, `./dataset/`, `./partitions/` and `./results/` are empty folders at the beginning and will be created when BNS-GCN is launched.
 
 ## Setup
 
@@ -109,6 +109,12 @@ If you want to reproduce core experiments of our paper (e.g., accuracy in Table 
 ### Run Customized Settings
 
 You may adjust `--n-partitions` and `--sampling-rate` to reproduce the results of BNS-GCN under other settings. To verify the exact throughput or time breakdown of BNS-GCN, please add `--no-eval` argument to skip the evaluation step. You may also use the argument `--partition-method=random` to explore the performance of BNS-GCN with random partition.
+
+### Run with Multiple Compute Nodes
+
+Our code base also supports distributed GCN training with multiple compute nodes. To achieve this, you should specify `--master-addr`, `--node-rank` and `--parts-per-node` for each compute node. An example is provided in `scripts/reddit_full.sh` where we train the Reddit graph over 4 compute nodes, each of which contains 10 GPUs, with 40 partitions in total. You should run the command on each node and specify the corresponding node rank.
+
+If the compute nodes do not share storage, you should partition the graph in a single device first and manually distribute the partitions to other compute nodes. When run the training script, please enable `--skip-partition` argument.
 
 
 

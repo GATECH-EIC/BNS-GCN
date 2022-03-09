@@ -1,3 +1,4 @@
+mkdir results
 for N_PARTITIONS in 3 6 10
 do
   for SAMPLING_RATE in 0.10 0.01 0.00
@@ -19,6 +20,6 @@ do
       --log-every 10 \
       --inductive \
       --use-pp \
-      |& tee results/yelp_n${N_PARTITIONS}_s${SAMPLING_RATE}_full.txt
+      |& tee results/yelp_n${N_PARTITIONS}_p${SAMPLING_RATE}_full.txt
   done
 done

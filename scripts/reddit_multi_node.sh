@@ -1,0 +1,19 @@
+python main.py \
+  --dataset reddit \
+  --dropout 0.5 \
+  --lr 0.01 \
+  --n-partitions 40 \
+  --n-epochs 3000 \
+  --model graphsage \
+  --sampling-rate .1 \
+  --n-layers 4 \
+  --n-hidden 256 \
+  --n-class 41 \
+  --n-feat 602 \
+  --n-train 153431 \
+  --master-addr 127.0.0.1 \
+  --node-rank 0 \
+  --parts-per-node 10 \
+  --log-every 10 \
+  --inductive \
+  --use-pp

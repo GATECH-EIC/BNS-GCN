@@ -1,3 +1,4 @@
+mkdir results
 for N_PARTITIONS in 5 8 10
 do
   for SAMPLING_RATE in 0.10 0.01 0.00
@@ -17,6 +18,6 @@ do
       --n-hidden 128 \
       --log-every 10 \
       --use-pp \
-      |& tee results/ogbn-products_n${N_PARTITIONS}_s${SAMPLING_RATE}_full.txt
+      |& tee results/ogbn-products_n${N_PARTITIONS}_p${SAMPLING_RATE}_full.txt
   done
 done

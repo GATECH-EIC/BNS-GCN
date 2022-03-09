@@ -1,3 +1,4 @@
+mkdir results
 for N_PARTITIONS in 2 4 8
 do
   for SAMPLING_RATE in 0.10 0.01 0.00
@@ -18,6 +19,6 @@ do
       --log-every 10 \
       --inductive \
       --use-pp \
-      |& tee results/reddit_n${N_PARTITIONS}_s${SAMPLING_RATE}_full.txt
+      |& tee results/reddit_n${N_PARTITIONS}_p${SAMPLING_RATE}_full.txt
   done
 done

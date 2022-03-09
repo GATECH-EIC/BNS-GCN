@@ -12,23 +12,31 @@ if __name__ == '__main__':
     if args.fix_seed is False:
         args.seed = random.randint(0, 1 << 31)
 
-    g, n_feat, n_class = load_data(args.dataset)
+    if args.graph_name == '':
+        if args.inductive:
+            args.graph_name = '%s-%d-%s-induc' % (args.dataset, args.n_partitions, args.partition_method)
+        else:
+            args.graph_name = '%s-%d-%s-trans' % (args.dataset, args.n_partitions, args.partition_method)
 
-    args.n_class = n_class
-    args.n_feat = n_feat
-    args.n_train = g.ndata['train_mask'].int().sum().item()
-
-    if args.inductive:
-        args.graph_name = '%s-%d-%s-induc' % (args.dataset, args.n_partitions, args.partition_method)
+    if args.skip_partition:
+        if args.n_feat == 0 or args.n_class == 0 or args.n_train == 0:
+            print('specifying `--n-feat`, `--n-class` and `--n-train` saves data loading time')
+            g, n_feat, n_class = load_data(args.dataset)
+            args.n_feat = n_feat
+            args.n_class = n_class
+            args.n_train = g.ndata['train_mask'].int().sum().item()
     else:
-        args.graph_name = '%s-%d-%s-trans' % (args.dataset, args.n_partitions, args.partition_method)
+        g, n_feat, n_class = load_data(args.dataset)
+        if args.node_rank == 0:
+            if args.inductive:
+                graph_partition(g.subgraph(g.ndata['train_mask']), args)
+            else:
+                graph_partition(g, args)
+        args.n_class = n_class
+        args.n_feat = n_feat
+        args.n_train = g.ndata['train_mask'].int().sum().item()
 
     print(args)
-
-    if args.inductive:
-        graph_partition(g.subgraph(g.ndata['train_mask']), args)
-    else:
-        graph_partition(g, args)
 
     if args.backend == 'gloo':
         processes = []
@@ -38,7 +46,8 @@ if __name__ == '__main__':
             n = torch.cuda.device_count()
             devices = [f'{i}' for i in range(n)]
         mp.set_start_method('spawn', force=True)
-        for i in range(args.n_partitions):
+        start_id = args.node_rank * args.parts_per_node
+        for i in range(start_id, min(start_id + args.parts_per_node, args.n_partitions)):
             os.environ['CUDA_VISIBLE_DEVICES'] = devices[i % len(devices)]
             p = mp.Process(target=train.init_processes, args=(i, args.n_partitions, args))
             p.start()

@@ -413,7 +413,7 @@ def init_processes(rank, size, args):
         local_rank = int(os.environ['OMPI_COMM_WORLD_LOCAL_RANK'])
         torch.cuda.set_device('cuda:%d' % local_rank)
     else:
-        os.environ['MASTER_ADDR'] = '127.0.0.1'
+        os.environ['MASTER_ADDR'] = args.master_addr
         os.environ['MASTER_PORT'] = '%d' % args.port
     dist.init_process_group(args.backend, rank=rank, world_size=size)
     g, node_dict, gpb = load_partition(args, rank)
