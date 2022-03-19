@@ -98,19 +98,6 @@ def load_data(dataset):
     return g, n_feat, n_class
 
 
-def print_data_info(data, g):
-    print("""----Data statistics------'
-      #Edges %d
-      #Classes %d
-      #Train samples %d
-      #Val samples %d
-      #Test samples %d""" %
-          (g.num_edges(), data.num_classes,
-           g.ndata['train_mask'].int().sum().item(),
-           g.ndata['val_mask'].int().sum().item(),
-           g.ndata['test_mask'].int().sum().item()))
-
-
 def graph_partition(g, args):
 
     graph_dir = 'partitions/' + args.graph_name + '/'
@@ -146,12 +133,15 @@ def load_partition(args, rank):
     node_feat['train_mask'] = node_feat[node_type + '/train_mask'].bool()
     node_feat.pop(node_type + '/label')
     node_feat.pop(node_type + '/feat')
+    node_feat.pop(node_type + '/in_degree')
     node_feat.pop(node_type + '/train_mask')
     if not args.inductive:
         node_feat['val_mask'] = node_feat[node_type + '/val_mask'].bool()
         node_feat['test_mask'] = node_feat[node_type + '/test_mask'].bool()
         node_feat.pop(node_type + '/val_mask')
         node_feat.pop(node_type + '/test_mask')
+    if args.dataset == 'ogbn-papers100m':
+        node_feat.pop(node_type + '/year')
     subg.ndata.clear()
     subg.edata.clear()
 
@@ -239,18 +229,6 @@ def merge_feature(feat, recv):
             recv[i - 1] = None
     recv[0] = feat
     return torch.cat(recv)
-
-
-def pop_redundant(g):
-    g.ndata.clear()
-    g.edata.clear()
-
-
-def popcount(x):
-    # count the number of bits in `x`
-    x = x - ((x >> 1) & 0x55555555)
-    x = (x & 0x33333333) + ((x >> 2) & 0x33333333)
-    return (((x + (x >> 4) & 0xF0F0F0F) * 0x1010101) & 0xffffffff) >> 24
 
 
 def inductive_split(g):

@@ -4,7 +4,7 @@ Cheng Wan<sup>\*</sup> (Rice University), Youjie Li<sup>\*</sup> (UIUC), Ang Li 
 
 (<sup>\*</sup>Equal contribution)
 
-Accepted at MLSys 2022
+Accepted at MLSys 2022 [Paper | [Docker](https://hub.docker.com/r/cheng1016/bns-gcn)]
 
 
 
@@ -38,12 +38,12 @@ Note that `./checkpoint/`, `./dataset/`, `./partitions/` and `./results/` are em
 - Python 3.8
 - CUDA 11.1
 - [PyTorch 1.8.0](https://github.com/pytorch/pytorch)
-- [customized DGL 0.7.0](https://github.com/chwan-rice/dgl)
+- [customized DGL 0.8.0](https://github.com/chwan-rice/dgl)
 - [OGB 1.3.0](https://ogb.stanford.edu/docs/home/)
 
 ### Installation
 
-#### Option 1: Run with Docker (Recommended)
+#### Option 1: Run with Docker (to be Updated Soon)
 
 We have prepared a [Docker package](https://hub.docker.com/r/cheng1016/bns-gcn) for BNS-GCN.
 
@@ -112,7 +112,7 @@ You may adjust `--n-partitions` and `--sampling-rate` to reproduce the results o
 
 ### Run with Multiple Compute Nodes
 
-Our code base also supports distributed GCN training with multiple compute nodes. To achieve this, you should specify `--master-addr`, `--node-rank` and `--parts-per-node` for each compute node. An example is provided in `scripts/reddit_full.sh` where we train the Reddit graph over 4 compute nodes, each of which contains 10 GPUs, with 40 partitions in total. You should run the command on each node and specify the corresponding node rank.
+Our code base also supports distributed GCN training with multiple compute nodes. To achieve this, you should specify `--master-addr`, `--node-rank` and `--parts-per-node` for each compute node. An example is provided in `scripts/reddit_multi_node.sh` where we train the Reddit graph over 4 compute nodes, each of which contains 10 GPUs, with 40 partitions in total. You should run the command on each node and specify the corresponding node rank. **Please turn on `--fix-seed` argument** so that all nodes initialize the same model weights.
 
 If the compute nodes do not share storage, you should partition the graph in a single device first and manually distribute the partitions to other compute nodes. When run the training script, please enable `--skip-partition` argument.
 

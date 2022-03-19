@@ -10,6 +10,8 @@ if __name__ == '__main__':
 
     args = create_parser()
     if args.fix_seed is False:
+        if args.parts_per_node < args.n_partitions:
+            print('Please enable `--fix-seed` for multi-node training')
         args.seed = random.randint(0, 1 << 31)
 
     if args.graph_name == '':

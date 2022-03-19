@@ -259,8 +259,6 @@ def run(graph, node_dict, gpb, args):
     torch.autograd.profiler.profile(False)
     torch.autograd.profiler.emit_nvtx(False)
 
-    # torch.set_printoptions(precision=13, edgeitems=6)
-
     rank, size = dist.get_rank(), dist.get_world_size()
     in_graph, out_graph = get_in_out_graph(graph, node_dict)
 
