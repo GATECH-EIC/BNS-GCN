@@ -16,4 +16,5 @@ python main.py \
   --parts-per-node 10 \
   --log-every 10 \
   --inductive \
+  --fix-seed \
   --use-pp
