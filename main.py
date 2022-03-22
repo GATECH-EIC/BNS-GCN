@@ -5,13 +5,14 @@ import sys
 import subprocess
 from helper.utils import *
 import train
+import warnings
 
 if __name__ == '__main__':
 
     args = create_parser()
     if args.fix_seed is False:
         if args.parts_per_node < args.n_partitions:
-            print('Please enable `--fix-seed` for multi-node training')
+            warnings.warn('Please enable `--fix-seed` for multi-node training.')
         args.seed = random.randint(0, 1 << 31)
 
     if args.graph_name == '':
@@ -24,7 +25,7 @@ if __name__ == '__main__':
 
     if args.skip_partition:
         if args.n_feat == 0 or args.n_class == 0 or args.n_train == 0:
-            print('specifying `--n-feat`, `--n-class` and `--n-train` saves data loading time')
+            warnings.warn('Specifying `--n-feat`, `--n-class` and `--n-train` saves data loading time.')
             g, n_feat, n_class = load_data(args.dataset)
             args.n_feat = n_feat
             args.n_class = n_class

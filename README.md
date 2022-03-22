@@ -4,7 +4,7 @@ Cheng Wan<sup>\*</sup> (Rice University), Youjie Li<sup>\*</sup> (UIUC), Ang Li 
 
 (<sup>\*</sup>Equal contribution)
 
-Accepted at MLSys 2022 [Paper | [Docker](https://hub.docker.com/r/cheng1016/bns-gcn)]
+Accepted at MLSys 2022 [[Paper](https://arxiv.org/abs/2203.10983) | [Docker](https://hub.docker.com/r/cheng1016/bns-gcn)]
 
 
 
