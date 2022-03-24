@@ -39,11 +39,11 @@ Note that `./checkpoint/`, `./dataset/`, `./partitions/` and `./results/` are em
 - CUDA 11.1
 - [PyTorch 1.8.0](https://github.com/pytorch/pytorch)
 - [customized DGL 0.8.0](https://github.com/chwan-rice/dgl)
-- [OGB 1.3.0](https://ogb.stanford.edu/docs/home/)
+- [OGB 1.3.2](https://ogb.stanford.edu/docs/home/)
 
 ### Installation
 
-#### Option 1: Run with Docker (to be Updated Soon)
+#### Option 1: Run with Docker
 
 We have prepared a [Docker package](https://hub.docker.com/r/cheng1016/bns-gcn) for BNS-GCN.
 

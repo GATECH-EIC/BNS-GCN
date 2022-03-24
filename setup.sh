@@ -5,7 +5,7 @@ cd dgl
 git submodule update --init --recursive
 mkdir build
 cd build
-cmake -DUSE_CUDA=ON ..
+cmake -DUSE_CUDA=ON -DBUILD_TORCH=ON ..
 make -j4
 cd ../python
 python setup.py install
