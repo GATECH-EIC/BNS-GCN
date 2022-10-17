@@ -4,7 +4,7 @@ Cheng Wan<sup>\*</sup> (Rice University), Youjie Li<sup>\*</sup> (UIUC), Ang Li 
 
 (<sup>\*</sup>Equal contribution)
 
-Accepted at MLSys 2022 [[Paper](https://arxiv.org/abs/2203.10983) | Video | [Slide](https://mlsys.org/media/mlsys-2022/Slides/2178.pdf) | [Docker](https://hub.docker.com/r/cheng1016/bns-gcn) | [Sibling](https://github.com/RICE-EIC/PipeGCN)]
+Accepted at MLSys 2022 [[Paper](https://arxiv.org/abs/2203.10983) | [Video](https://youtu.be/9fSPBwCnpXI) | [Slide](https://mlsys.org/media/mlsys-2022/Slides/2178.pdf) | [Docker](https://hub.docker.com/r/cheng1016/bns-gcn) | [Sibling](https://github.com/RICE-EIC/PipeGCN)]
 
 
 
