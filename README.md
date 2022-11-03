@@ -36,10 +36,10 @@ Note that `./checkpoint/`, `./dataset/`, `./partitions/` and `./results/` are em
 
 - Ubuntu 18.04
 - Python 3.8
-- CUDA 11.1
-- [PyTorch 1.8.0](https://github.com/pytorch/pytorch)
+- CUDA 11.3
+- [PyTorch 1.12.0](https://github.com/pytorch/pytorch)
 - [DGL 0.9.1](https://github.com/dmlc/dgl)
-- [OGB 1.3.2](https://ogb.stanford.edu/docs/home/)
+- [OGB 1.3.5](https://ogb.stanford.edu/docs/home/)
 
 ### Installation
 
@@ -62,7 +62,7 @@ bash setup.sh
 
 #### Option 3: Do it Yourself
 
-If the above options fail to run BNS-GCN, Please follow the official guides ([[1]](https://pytorch.org/get-started/locally/), [[2]](https://docs.dgl.ai/install), [[3]](https://ogb.stanford.edu/docs/home/)) to install PyTorch, DGL and OGB.
+If the above options fail to run BNS-GCN, Please follow the official guides ([[1]](https://pytorch.org/get-started/locally/), [[2]](https://www.dgl.ai/pages/start.html), [[3]](https://ogb.stanford.edu/docs/home/)) to install PyTorch, DGL and OGB.
 
 ### Datasets
 
