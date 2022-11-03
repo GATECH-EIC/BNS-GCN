@@ -2,7 +2,7 @@ import os
 
 import scipy
 import dgl
-from dgl.data import RedditDataset
+from dgl.data import RedditDataset, YelpDataset
 from dgl.distributed import partition_graph
 from helper.context import *
 from ogb.nodeproppred import DglNodePropPredDataset
@@ -32,57 +32,23 @@ def load_ogb_dataset(name):
     return g
 
 
-def load_yelp():
-
-    prefix = './dataset/yelp/'
-
-    with open(prefix + 'class_map.json') as f:
-        class_map = json.load(f)
-    with open(prefix + 'role.json') as f:
-        role = json.load(f)
-
-    adj_full = scipy.sparse.load_npz(prefix + 'adj_full.npz')
-    feats = np.load(prefix + 'feats.npy')
-    n_node = feats.shape[0]
-
-    g = dgl.from_scipy(adj_full)
-    node_data = g.ndata
-
-    label = list(class_map.values())
-    node_data['label'] = torch.tensor(label)
-
-    node_data['train_mask'] = torch.zeros(n_node, dtype=torch.bool)
-    node_data['val_mask'] = torch.zeros(n_node, dtype=torch.bool)
-    node_data['test_mask'] = torch.zeros(n_node, dtype=torch.bool)
-    node_data['train_mask'][role['tr']] = True
-    node_data['val_mask'][role['va']] = True
-    node_data['test_mask'][role['te']] = True
-
-    assert torch.all(torch.logical_not(torch.logical_and(node_data['train_mask'], node_data['val_mask'])))
-    assert torch.all(torch.logical_not(torch.logical_and(node_data['train_mask'], node_data['test_mask'])))
-    assert torch.all(torch.logical_not(torch.logical_and(node_data['val_mask'], node_data['test_mask'])))
-    assert torch.all(torch.logical_or(torch.logical_or(node_data['train_mask'], node_data['val_mask']), node_data['test_mask']))
-
-    train_feats = feats[node_data['train_mask']]
-    scaler = StandardScaler()
-    scaler.fit(train_feats)
-    feats = scaler.transform(feats)
-
-    node_data['feat'] = torch.tensor(feats, dtype=torch.float)
-
-    return g
-
-
 def load_data(dataset):
     if dataset == 'reddit':
         data = RedditDataset(raw_dir='./dataset/')
         g = data[0]
+        print(g.ndata['train_mask'].type())
     elif dataset == 'ogbn-products':
         g = load_ogb_dataset('ogbn-products')
     elif dataset == 'ogbn-papers100m':
         g = load_ogb_dataset('ogbn-papers100M')
     elif dataset == 'yelp':
-        g = load_yelp()
+        data = YelpDataset(raw_dir='./dataset/')
+        g = data[0]
+        g.ndata['label'] = g.ndata['label'].float()
+        # TODO: remove the following lines later (see Issue #4806 of DGL).
+        g.ndata['train_mask'] = g.ndata['train_mask'].bool()
+        g.ndata['val_mask'] = g.ndata['val_mask'].bool()
+        g.ndata['test_mask'] = g.ndata['test_mask'].bool()
     else:
         raise ValueError('Unknown dataset: {}'.format(dataset))
 
