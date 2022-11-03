@@ -16,8 +16,8 @@ class TransferTag:
     FEAT = 1
 
 
-def load_ogb_dataset(name):
-    dataset = DglNodePropPredDataset(name=name, root='./dataset/')
+def load_ogb_dataset(name, data_path):
+    dataset = DglNodePropPredDataset(name=name, root=data_path)
     split_idx = dataset.get_idx_split()
     g, label = dataset[0]
     n_node = g.num_nodes()
@@ -32,17 +32,16 @@ def load_ogb_dataset(name):
     return g
 
 
-def load_data(dataset):
-    if dataset == 'reddit':
-        data = RedditDataset(raw_dir='./dataset/')
+def load_data(args):
+    if args.dataset == 'reddit':
+        data = RedditDataset(raw_dir=args.data_path)
         g = data[0]
-        print(g.ndata['train_mask'].type())
-    elif dataset == 'ogbn-products':
-        g = load_ogb_dataset('ogbn-products')
-    elif dataset == 'ogbn-papers100m':
-        g = load_ogb_dataset('ogbn-papers100M')
-    elif dataset == 'yelp':
-        data = YelpDataset(raw_dir='./dataset/')
+    elif args.dataset == 'ogbn-products':
+        g = load_ogb_dataset('ogbn-products', args.data_path)
+    elif args.dataset == 'ogbn-papers100m':
+        g = load_ogb_dataset('ogbn-papers100M', args.data_path)
+    elif args.dataset == 'yelp':
+        data = YelpDataset(raw_dir=args.data_path)
         g = data[0]
         g.ndata['label'] = g.ndata['label'].float()
         # TODO: remove the following lines later (see Issue #4806 of DGL).
@@ -50,7 +49,7 @@ def load_data(dataset):
         g.ndata['val_mask'] = g.ndata['val_mask'].bool()
         g.ndata['test_mask'] = g.ndata['test_mask'].bool()
     else:
-        raise ValueError('Unknown dataset: {}'.format(dataset))
+        raise ValueError('Unknown dataset: {}'.format(args.dataset))
 
     n_feat = g.ndata['feat'].shape[1]
     if g.ndata['label'].dim() == 1:

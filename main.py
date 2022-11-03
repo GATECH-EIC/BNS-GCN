@@ -26,12 +26,12 @@ if __name__ == '__main__':
     if args.skip_partition:
         if args.n_feat == 0 or args.n_class == 0 or args.n_train == 0:
             warnings.warn('Specifying `--n-feat`, `--n-class` and `--n-train` saves data loading time.')
-            g, n_feat, n_class = load_data(args.dataset)
+            g, n_feat, n_class = load_data(args)
             args.n_feat = n_feat
             args.n_class = n_class
             args.n_train = g.ndata['train_mask'].int().sum().item()
     else:
-        g, n_feat, n_class = load_data(args.dataset)
+        g, n_feat, n_class = load_data(args)
         if args.node_rank == 0:
             if args.inductive:
                 graph_partition(g.subgraph(g.ndata['train_mask']), args)

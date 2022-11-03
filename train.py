@@ -268,10 +268,10 @@ def run(graph, node_dict, gpb, args):
 
     if args.eval:
         if args.inductive is False:
-            val_g, _, _ = load_data(args.dataset)
+            val_g, _, _ = load_data(args)
             test_g = val_g
         else:
-            g, _, _ = load_data(args.dataset)
+            g, _, _ = load_data(args)
             _, val_g, test_g = inductive_split(g)
     else:
         val_g = test_g = None
