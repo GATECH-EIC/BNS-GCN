@@ -5,6 +5,8 @@ def create_parser():
     parser = argparse.ArgumentParser(description='BNS-GCN')
     parser.add_argument("--dataset", type=str, default='reddit',
                         help="the input dataset")
+    parser.add_argument("--data-path", "--data_path", type=str, default='./dataset/',
+                        help="the storage path of datasets")
     parser.add_argument("--graph-name", "--graph_name", type=str, default='')
     parser.add_argument("--model", type=str, default='graphsage',
                         help="model for training")
