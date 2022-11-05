@@ -54,7 +54,7 @@ docker run --gpus all -it cheng1016/bns-gcn
 
 #### Option 2: Install with Pip
 
-Running the following command will install DGL from source and other prerequisites from pip.
+Running the following command will install all prerequisites from pip.
 
 ```bash
 pip install -r requirements.txt
@@ -66,8 +66,7 @@ If the above options fail to run BNS-GCN, Please follow the official guides ([[1
 
 ### Datasets
 
-We use Reddit, ogbn-products, Yelp and ogbn-papers100M for evaluating BNS-GCN. All datasets are supposed to be stored in `./dataset/` by default. Reddit, ogbn-products and ogbn-papers100M will be downloaded by DGL or OGB automatically. Yelp is preloaded in the Docker environment, and is available [here](https://drive.google.com/open?id=1zycmmDES39zVlbVCYs88JTJ1Wm5FbfLz) or [here](https://pan.baidu.com/s/1SOb0SiSAXavwAcNqkttwcg) (with passcode f1ao) if you choose to set up the enviromnent by yourself. 
-
+We use Reddit, ogbn-products, Yelp and ogbn-papers100M for evaluating BNS-GCN. All datasets are supposed to be stored in `./dataset/` by default.
 
 
 ## Basic Usage
