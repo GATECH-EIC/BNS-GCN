@@ -44,10 +44,15 @@ def load_data(args):
         data = YelpDataset(raw_dir=args.data_path)
         g = data[0]
         g.ndata['label'] = g.ndata['label'].float()
-        # TODO: remove the following lines later (see Issue #4806 of DGL).
+        # TODO: remove the following three lines later (see Issue #4806 of DGL).
         g.ndata['train_mask'] = g.ndata['train_mask'].bool()
         g.ndata['val_mask'] = g.ndata['val_mask'].bool()
         g.ndata['test_mask'] = g.ndata['test_mask'].bool()
+        feats = g.ndata['feat']
+        scaler = StandardScaler()
+        scaler.fit(feats[g.ndata['train_mask']])
+        feats = scaler.transform(feats)
+        g.ndata['feat'] = torch.tensor(feats, dtype=torch.float)
     else:
         raise ValueError('Unknown dataset: {}'.format(args.dataset))
 
