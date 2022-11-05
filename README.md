@@ -54,10 +54,10 @@ docker run --gpus all -it cheng1016/bns-gcn
 
 #### Option 2: Install with Pip
 
-Running the following command will install DGL from source and other prerequisites from conda.
+Running the following command will install DGL from source and other prerequisites from pip.
 
 ```bash
-bash setup.sh
+pip install -r requirements.txt
 ```
 
 #### Option 3: Do it Yourself
