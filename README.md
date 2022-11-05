@@ -36,10 +36,10 @@ Note that `./checkpoint/`, `./dataset/`, `./partitions/` and `./results/` are em
 
 - Ubuntu 18.04
 - Python 3.8
-- CUDA 11.1
-- [PyTorch 1.8.0](https://github.com/pytorch/pytorch)
-- [customized DGL 0.8.0](https://github.com/chwan-rice/dgl)
-- [OGB 1.3.2](https://ogb.stanford.edu/docs/home/)
+- CUDA 11.3
+- [PyTorch 1.12.0](https://github.com/pytorch/pytorch)
+- [DGL 0.9.1](https://github.com/dmlc/dgl)
+- [OGB 1.3.5](https://ogb.stanford.edu/docs/home/)
 
 ### Installation
 
@@ -52,17 +52,17 @@ docker pull cheng1016/bns-gcn
 docker run --gpus all -it cheng1016/bns-gcn
 ```
 
-#### Option 2: Install with Conda
+#### Option 2: Install with Pip
 
-Running the following command will install DGL from source and other prerequisites from conda.
+Running the following command will install DGL from source and other prerequisites from pip.
 
 ```bash
-bash setup.sh
+pip install -r requirements.txt
 ```
 
 #### Option 3: Do it Yourself
 
-Please follow the official guides ([[1]](https://github.com/pytorch/pytorch), [[2]](https://ogb.stanford.edu/docs/home/)) to install PyTorch and OGB. For DGL, please follow the [official guide](https://docs.dgl.ai/install/index.html#install-from-source) to install our customized DGL **from source** (do NOT forget to adjust the first `git clone` command to clone [our customized repo](https://github.com/chwan-rice/dgl)).  We are contacting the DGL team to integrate our modification that supports minimizing communication volume for graph partition.
+If the above options fail to run BNS-GCN, Please follow the official guides ([[1]](https://pytorch.org/get-started/locally/), [[2]](https://www.dgl.ai/pages/start.html), [[3]](https://ogb.stanford.edu/docs/home/)) to install PyTorch, DGL and OGB.
 
 ### Datasets
 
