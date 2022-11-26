@@ -62,7 +62,7 @@ pip install -r requirements.txt
 
 #### Option 3: Do it Yourself
 
-If the above options fail to run BNS-GCN, Please follow the official guides ([[1]](https://pytorch.org/get-started/locally/), [[2]](https://www.dgl.ai/pages/start.html), [[3]](https://ogb.stanford.edu/docs/home/)) to install PyTorch, DGL and OGB.
+If the above options fail to run BNS-GCN, please follow the official guides ([[1]](https://pytorch.org/get-started/locally/), [[2]](https://www.dgl.ai/pages/start.html), [[3]](https://ogb.stanford.edu/docs/home/)) to install PyTorch, DGL and OGB.
 
 ### Datasets
 
