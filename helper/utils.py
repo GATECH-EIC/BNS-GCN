@@ -14,6 +14,7 @@ from sklearn.preprocessing import StandardScaler
 class TransferTag:
     NODE = 0
     FEAT = 1
+    DEG = 2
 
 
 def load_ogb_dataset(name, data_path):
@@ -79,7 +80,8 @@ def graph_partition(g, args):
             if args.inductive:
                 g.ndata.pop('val_mask')
                 g.ndata.pop('test_mask')
-            g.ndata['in_degree'] = g.in_degrees()
+            g.ndata['in_deg'] = g.in_degrees()
+            g.ndata['out_deg'] = g.out_degrees()
             partition_graph(g, args.graph_name, args.n_partitions, graph_dir,  part_method=args.partition_method,
                             reshuffle=True, balance_edges=False, objtype=args.partition_obj)
 
@@ -99,11 +101,13 @@ def load_partition(args, rank):
     node_feat['inner_node'] = subg.ndata['inner_node'].bool()
     node_feat['label'] = node_feat[node_type + '/label']
     node_feat['feat'] = node_feat[node_type + '/feat']
-    node_feat['in_degree'] = node_feat[node_type + '/in_degree']
+    node_feat['in_deg'] = node_feat[node_type + '/in_deg']
+    node_feat['out_deg'] = node_feat[node_type + '/out_deg']
     node_feat['train_mask'] = node_feat[node_type + '/train_mask'].bool()
     node_feat.pop(node_type + '/label')
     node_feat.pop(node_type + '/feat')
-    node_feat.pop(node_type + '/in_degree')
+    node_feat.pop(node_type + '/in_deg')
+    node_feat.pop(node_type + '/out_deg')
     node_feat.pop(node_type + '/train_mask')
     if not args.inductive:
         node_feat['val_mask'] = node_feat[node_type + '/val_mask'].bool()

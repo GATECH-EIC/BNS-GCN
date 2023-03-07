@@ -23,6 +23,41 @@ class GNNBase(nn.Module):
         self.dropout = nn.Dropout(p=dropout)
 
 
+class GCN(GNNBase):
+
+    def __init__(self, layer_size, activation, use_pp, dropout=0.5, norm='layer', train_size=None, n_linear=0):
+        super(GCN, self).__init__(layer_size, activation, use_pp, dropout, norm, n_linear)
+        for i in range(self.n_layers):
+            if i < self.n_layers - self.n_linear:
+                self.layers.append(GCNLayer(layer_size[i], layer_size[i + 1], use_pp=use_pp))
+            else:
+                self.layers.append(nn.Linear(layer_size[i], layer_size[i + 1]))
+            if i < self.n_layers - 1 and self.use_norm:
+                if norm == 'layer':
+                    self.norm.append(nn.LayerNorm(layer_size[i + 1], elementwise_affine=True))
+                elif norm == 'batch':
+                    self.norm.append(SyncBatchNorm(layer_size[i + 1], train_size))
+            use_pp = False
+
+    def forward(self, g, feat, in_norm=None, out_norm=None):
+        h = feat
+        for i in range(self.n_layers):
+            h = self.dropout(h)
+            if i < self.n_layers - self.n_linear:
+                if self.training and (i > 0 or not self.use_pp):
+                    h = ctx.buffer.update(i, h)
+                h = self.layers[i](g, h, in_norm, out_norm)
+            else:
+                h = self.layers[i](h)
+
+            if i < self.n_layers - 1:
+                if self.use_norm:
+                    h = self.norm[i](h)
+                h = self.activation(h)
+
+        return h
+
+
 class GraphSAGE(GNNBase):
 
     def __init__(self, layer_size, activation, use_pp, dropout=0.5, norm='layer', train_size=None, n_linear=0):
@@ -39,14 +74,14 @@ class GraphSAGE(GNNBase):
                     self.norm.append(SyncBatchNorm(layer_size[i + 1], train_size))
             use_pp = False
 
-    def forward(self, g, feat, in_deg=None):
+    def forward(self, g, feat, in_norm=None):
         h = feat
         for i in range(self.n_layers):
             h = self.dropout(h)
             if i < self.n_layers - self.n_linear:
                 if self.training and (i > 0 or not self.use_pp):
                     h = ctx.buffer.update(i, h)
-                h = self.layers[i](g, h, in_deg)
+                h = self.layers[i](g, h, in_norm)
             else:
                 h = self.layers[i](h)
 

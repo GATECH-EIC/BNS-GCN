@@ -74,7 +74,7 @@ We use Reddit, ogbn-products, Yelp and ogbn-papers100M for evaluating BNS-GCN. A
 ### Core Training Options
 
 - `--dataset`: the dataset you want to use
-- `--model`: the GCN model (only GraphSAGE and GAT are supported at this moment)
+- `--model`: the GCN model (only GCN, GraphSAGE and GAT are supported at this moment)
 - `--lr`: learning rate
 - `--sampling-rate`: the sampling rate of BNS-GCN
 - `--n-epochs`: the number of training epochs

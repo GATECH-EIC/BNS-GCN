@@ -142,7 +142,29 @@ def order_graph(part, graph, gpb, node_dict, pos):
         nodes = node_dict[dgl.NID][node_dict['part_id'] == i] - start
         nodes, _ = torch.sort(nodes)
         one_hops.append(nodes)
-    return construct(part, graph, pos, one_hops)
+    return construct_graph(part, graph, pos, one_hops)
+
+
+def collect_out_degree(node_dict, boundary):
+    rank, size = dist.get_rank(), dist.get_world_size()
+    out_deg = node_dict['out_deg']
+    send_info = []
+    for i, b in enumerate(boundary):
+        if i == rank:
+            send_info.append(None)
+            continue
+        else:
+            send_info.append(out_deg[b])
+    recv_shape = []
+    for i in range(size):
+        if i == rank:
+            recv_shape.append(None)
+            continue
+        else:
+            s = (node_dict['part_id'] == i).int().sum()
+            recv_shape.append(torch.Size([s]))
+    recv_out_deg = data_transfer(send_info, recv_shape, tag=TransferTag.DEG, dtype=torch.long)
+    return merge_feature(out_deg, recv_out_deg)
 
 
 def precompute(part, graph, node_dict, boundary, model, gpb, pos):
@@ -165,12 +187,20 @@ def precompute(part, graph, node_dict, boundary, model, gpb, pos):
             s = (node_dict['part_id'] == i).int().sum()
             recv_shape.append(torch.Size([s, feat.shape[1]]))
     recv_feat = data_transfer(send_info, recv_shape, tag=TransferTag.FEAT, dtype=torch.float)
-    if model == 'gcn' or model == 'resgcn':
-        raise NotImplementedError
+    if model == 'gcn':
+        in_norm = torch.sqrt(node_dict['in_deg'])
+        out_norm = torch.sqrt(node_dict['out_deg'])
+        with graph.local_scope():
+            graph.nodes['_U'].data['h'] = merge_feature(feat, recv_feat)
+            graph.nodes['_U'].data['h'] /= out_norm.unsqueeze(-1)
+            graph['_E'].update_all(fn.copy_u(u='h', out='m'),
+                                   fn.mean(msg='m', out='h'),
+                                   etype='_E')
+            return graph.nodes['_V'].data['h'] / in_norm.unsqueeze(-1)
     elif model == 'graphsage':
         with graph.local_scope():
             graph.nodes['_U'].data['h'] = merge_feature(feat, recv_feat)
-            graph['_E'].update_all(fn.copy_src(src='h', out='m'),
+            graph['_E'].update_all(fn.copy_u(u='h', out='m'),
                                    fn.mean(msg='m', out='h'),
                                    etype='_E')
             mean_feat = graph.nodes['_V'].data['h']
@@ -182,7 +212,10 @@ def precompute(part, graph, node_dict, boundary, model, gpb, pos):
 
 
 def create_model(layer_size, args):
-    if args.model == 'graphsage':
+    if args.model == 'gcn':
+        return GCN(layer_size, F.relu, norm=args.norm, use_pp=args.use_pp, dropout=args.dropout,
+                   train_size=args.n_train, n_linear=args.n_linear)
+    elif args.model == 'graphsage':
         return GraphSAGE(layer_size, F.relu, norm=args.norm, use_pp=args.use_pp, dropout=args.dropout,
                          train_size=args.n_train, n_linear=args.n_linear)
     elif args.model == 'gat':
@@ -209,7 +242,18 @@ def reduce_hook(param, name, n_train):
     return fn
 
 
-def construct(part, graph, pos, one_hops):
+def construct_out_norm(num, norm, pos, one_hops):
+    rank, size = dist.get_rank(), dist.get_world_size()
+    out_norm_list = [norm[0:num]]
+    for i in range(size):
+        if i == rank:
+            continue
+        else:
+            out_norm_list.append(norm[pos[i][one_hops[i]]])
+    return torch.cat(out_norm_list)
+
+
+def construct_graph(part, graph, pos, one_hops):
     rank, size = dist.get_rank(), dist.get_world_size()
     tot = part.num_nodes()
     u, v = part.edges()
@@ -303,6 +347,7 @@ def run(graph, node_dict, gpb, args):
     ctx.buffer.init_buffer(in_graph.num_nodes(), ratio, send_size, recv_size, layer_size[:args.n_layers - args.n_linear],
                            use_pp=args.use_pp, backend=args.backend)
 
+    node_dict['out_deg'] = collect_out_degree(node_dict, boundary)
     if args.use_pp:
         node_dict['feat'] = precompute(in_graph, graph, node_dict, boundary, args.model, gpb, pos)
 
@@ -328,7 +373,11 @@ def run(graph, node_dict, gpb, args):
 
     feat = node_dict['feat']
     train_mask = node_dict['train_mask']
-    in_deg = node_dict['in_degree'][0:in_graph.num_nodes()]
+    if args.model == 'gcn':
+        in_norm = torch.sqrt(node_dict['in_deg'])
+        out_norm = torch.sqrt(node_dict['out_deg'])
+    elif args.model == 'graphsage':
+        in_norm = node_dict['in_deg']
 
     del graph
     del node_dict
@@ -340,12 +389,16 @@ def run(graph, node_dict, gpb, args):
         one_hops = data_transfer(selected, recv_shape, tag=TransferTag.NODE, dtype=torch.long)
         ctx.buffer.set_selected(selected)
 
-        g = construct(in_graph, out_graph, pos, one_hops)
+        g = construct_graph(in_graph, out_graph, pos, one_hops)
 
         model.train()
 
-        if args.model == 'graphsage':
-            logits = model(g, feat, in_deg)
+        if args.model == 'gcn':
+            # print(out_norm[:g.num_nodes('_V')].shape, out_norm[one_hops].shape)
+            out_norm_ = construct_out_norm(g.num_nodes('_V'), out_norm, pos, one_hops)
+            logits = model(g, feat, in_norm, out_norm_)
+        elif args.model == 'graphsage':
+            logits = model(g, feat, in_norm)
         elif args.model == 'gat':
             logits = model(g, construct_feat(g.num_nodes('_V'), feat, pos, one_hops))
         else:
@@ -372,7 +425,7 @@ def run(graph, node_dict, gpb, args):
 
         comm_timer.clear()
 
-        if args.eval and rank == 0 and (epoch + 1) % args.log_every == 0:
+        if args.eval and rank == 0 and (epoch + 1) % args.log_every == 0 and epoch > 300:
             torch.save(model.state_dict(), 'checkpoint/%s_p%.2f_%d.pth.tar' % (args.graph_name, args.sampling_rate, epoch))
             if thread is not None:
                 model_copy, val_acc = thread.get()
