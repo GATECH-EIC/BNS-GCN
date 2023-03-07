@@ -194,7 +194,7 @@ def precompute(part, graph, node_dict, boundary, model, gpb, pos):
             graph.nodes['_U'].data['h'] = merge_feature(feat, recv_feat)
             graph.nodes['_U'].data['h'] /= out_norm.unsqueeze(-1)
             graph['_E'].update_all(fn.copy_u(u='h', out='m'),
-                                   fn.mean(msg='m', out='h'),
+                                   fn.sum(msg='m', out='h'),
                                    etype='_E')
             return graph.nodes['_V'].data['h'] / in_norm.unsqueeze(-1)
     elif model == 'graphsage':
@@ -425,7 +425,7 @@ def run(graph, node_dict, gpb, args):
 
         comm_timer.clear()
 
-        if args.eval and rank == 0 and (epoch + 1) % args.log_every == 0 and epoch > 300:
+        if args.eval and rank == 0 and (epoch + 1) % args.log_every == 0:
             torch.save(model.state_dict(), 'checkpoint/%s_p%.2f_%d.pth.tar' % (args.graph_name, args.sampling_rate, epoch))
             if thread is not None:
                 model_copy, val_acc = thread.get()
