@@ -394,7 +394,6 @@ def run(graph, node_dict, gpb, args):
         model.train()
 
         if args.model == 'gcn':
-            # print(out_norm[:g.num_nodes('_V')].shape, out_norm[one_hops].shape)
             out_norm_ = construct_out_norm(g.num_nodes('_V'), out_norm, pos, one_hops)
             logits = model(g, feat, in_norm, out_norm_)
         elif args.model == 'graphsage':
