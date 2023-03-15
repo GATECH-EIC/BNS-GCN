@@ -117,8 +117,23 @@ If the compute nodes do not share storage, you should partition the graph in a s
 
 
 
+## Citation
+
+```
+@article{wan2022bns,
+  title={{BNS-GCN}: Efficient Full-graph Training of Graph Convolutional Networks with Partition-parallelism and Random Boundary Node Sampling},
+  author={Wan, Cheng and Li, Youjie and Li, Ang and Kim, Nam Sung and Lin, Yingyan},
+  journal={Proceedings of Machine Learning and Systems},
+  volume={4},
+  pages={673--693},
+  year={2022}
+}
+```
+
+
+
 ## License
 
-Copyright (c) 2022 RICE-EIC. All rights reserved.
+Copyright (c) 2022 GaTech-EIC. All rights reserved.
 
 Licensed under the [MIT](https://github.com/RICE-EIC/BNS-GCN/blob/master/LICENSE) license.
