@@ -9,6 +9,7 @@ from ogb.nodeproppred import DglNodePropPredDataset
 import json
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+import json
 
 
 class TransferTag:
@@ -69,10 +70,18 @@ def load_data(args):
     return g, n_feat, n_class
 
 
-def graph_partition(g, args):
+def graph_partition(args):
 
-    graph_dir = 'partitions/' + args.graph_name + '/'
-    part_config = graph_dir + args.graph_name + '.json'
+    g, n_feat, n_class = load_data(args)
+    if args.inductive:
+        g = g.subgraph(g.ndata['train_mask'])
+
+    n_class = n_class
+    n_feat = n_feat
+    n_train = g.ndata['train_mask'].int().sum().item()
+
+    graph_dir = os.path.join(args.part_path, args.graph_name)
+    part_config = os.path.join(graph_dir, args.graph_name + '.json')
 
     # TODO: after being saved, a bool tensor becomes a uint8 tensor (including 'inner_node')
     if not os.path.exists(part_config):
@@ -83,13 +92,16 @@ def graph_partition(g, args):
             g.ndata['in_deg'] = g.in_degrees()
             g.ndata['out_deg'] = g.out_degrees()
             partition_graph(g, args.graph_name, args.n_partitions, graph_dir,  part_method=args.partition_method,
-                            reshuffle=True, balance_edges=False, objtype=args.partition_obj)
+                            balance_edges=False, objtype=args.partition_obj)
+    
+    with open(os.path.join(graph_dir, 'meta.json'), 'w') as f:
+        json.dump({'n_feat': n_feat, 'n_class': n_class, 'n_train': n_train}, f)
 
 
 def load_partition(args, rank):
 
-    graph_dir = 'partitions/' + args.graph_name + '/'
-    part_config = graph_dir + args.graph_name + '.json'
+    graph_dir = os.path.join(args.part_path, args.graph_name)
+    part_config = os.path.join(graph_dir, args.graph_name + '.json')
 
     print('loading partitions')
 
@@ -118,6 +130,12 @@ def load_partition(args, rank):
         node_feat.pop(node_type + '/year')
     subg.ndata.clear()
     subg.edata.clear()
+
+    with open(os.path.join(graph_dir, 'meta.json'), 'r') as f:
+        meta = json.load(f)
+        args.n_feat = meta['n_feat']
+        args.n_class = meta['n_class']
+        args.n_train = meta['n_train']
 
     return subg, node_feat, gpb
 

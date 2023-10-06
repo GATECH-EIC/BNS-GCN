@@ -3,6 +3,9 @@
 
 # Data
 data/
+partition/
+checkpoint/
+results/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

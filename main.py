@@ -23,23 +23,12 @@ if __name__ == '__main__':
             args.graph_name = '%s-%d-%s-%s-trans' % (args.dataset, args.n_partitions,
                                                      args.partition_method, args.partition_obj)
 
-    if args.skip_partition:
-        if args.n_feat == 0 or args.n_class == 0 or args.n_train == 0:
-            warnings.warn('Specifying `--n-feat`, `--n-class` and `--n-train` saves data loading time.')
-            g, n_feat, n_class = load_data(args)
-            args.n_feat = n_feat
-            args.n_class = n_class
-            args.n_train = g.ndata['train_mask'].int().sum().item()
-    else:
-        g, n_feat, n_class = load_data(args)
+    if not args.skip_partition:
         if args.node_rank == 0:
             if args.inductive:
-                graph_partition(g.subgraph(g.ndata['train_mask']), args)
+                graph_partition(args)
             else:
-                graph_partition(g, args)
-        args.n_class = n_class
-        args.n_feat = n_feat
-        args.n_train = g.ndata['train_mask'].int().sum().item()
+                graph_partition(args)
 
     print(args)
 

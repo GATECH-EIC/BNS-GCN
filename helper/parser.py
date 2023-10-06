@@ -7,6 +7,8 @@ def create_parser():
                         help="the input dataset")
     parser.add_argument("--data-path", "--data_path", type=str, default='./dataset/',
                         help="the storage path of datasets")
+    parser.add_argument("--part-path", "--part_path", type=str, default='./partition/',
+                        help="the storage path of graph partitions")
     parser.add_argument("--graph-name", "--graph_name", type=str, default='')
     parser.add_argument("--model", type=str, default='graphsage',
                         help="model for training")
@@ -25,9 +27,6 @@ def create_parser():
                         help="the number of hidden units")
     parser.add_argument("--n-layers", "--n_layers", type=int, default=2,
                         help="the number of GCN layers")
-    parser.add_argument("--n-feat", "--n_feat", type=int, default=0)
-    parser.add_argument("--n-class", "--n_class", type=int, default=0)
-    parser.add_argument("--n-train", "--n_train", type=int, default=0)
     parser.add_argument("--log-every", "--log_every", type=int, default=10)
     parser.add_argument("--weight-decay", "--weight_decay", type=float, default=0,
                         help="weight for L2 loss")
